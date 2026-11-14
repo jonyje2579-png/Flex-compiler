@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flex — язык, который читается как английский</title>
+<meta name="description" content="Flex — современный язык программирования без лишнего синтаксиса. Читается как книга, работает как инструмент.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg-soft: #13131a;
+    --bg-card: #1a1a25;
+    --border: #262633;
+    --text: #e5e5ea;
+    --text-dim: #8b8b9a;
+    --accent: #a78bfa;
+    --accent-2: #7c3aed;
+    --green: #4ade80;
+    --red: #f87171;
+    --yellow: #fbbf24;
+    --blue: #60a5fa;
+    --pink: #f472b6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  code, pre, .mono {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  /* === NAV === */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(10, 10, 15, 0.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 0;
+  }
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .logo {
+    font-weight: 800;
+    font-size: 22px;
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    background: var(--accent);
+    color: var(--bg);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    transition: transform 0.2s;
+  }
+  .nav-cta:hover { transform: translateY(-1px); }
+
+  /* === HERO === */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 24px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 20%; left: 50%;
+    transform: translateX(-50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, var(--accent-2) 0%, transparent 60%);
+    opacity: 0.15;
+    filter: blur(80px);
+    z-index: 0;
+  }
+  .hero-content {
+    max-width: 1200px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-text h1 {
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    letter-spacing: -0.02em;
+  }
+  .hero-text h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-text p {
+    font-size: 18px;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    max-width: 500px;
+  }
+  .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; }
+  .btn {
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+  }
+  .btn-primary:hover {
+    background: var(--accent-2);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3);
+  }
+  .btn-secondary {
+    background: var(--bg-card);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover {
+    background: var(--bg-soft);
+    border-color: var(--accent);
+  }
+
+  /* Code window */
+  .code-window {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .code-header {
+    background: var(--bg-card);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot.red { background: var(--red); }
+  .dot.yellow { background: var(--yellow); }
+  .dot.green { background: var(--green); }
+  .code-title {
+    margin-left: 12px;
+    font-size: 13px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .code-body {
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    min-height: 200px;
+  }
+  .kw { color: var(--pink); }
+  .str { color: var(--green); }
+  .num { color: var(--yellow); }
+  .fn { color: var(--blue); }
+  .com { color: var(--text-dim); font-style: italic; }
+  .var { color: var(--text); }
+
+  /* === SECTIONS === */
+  section {
+    padding: 100px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .section-title {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+  .section-subtitle {
+    color: var(--text-dim);
+    font-size: 18px;
+    margin-bottom: 48px;
+    max-width: 600px;
+  }
+
+  /* === PLAYGROUND === */
+  #playground {
+    background: linear-gradient(180deg, transparent, rgba(124, 58, 237, 0.03), transparent);
+  }
+  .playground-wrap {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .playground-toolbar {
+    background: var(--bg-card);
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .examples-select {
+    background: var(--bg-soft);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .run-btn {
+    background: var(--green);
+    color: #0a0a0f;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  .run-btn:hover { transform: scale(1.05); }
+  .playground-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 400px;
+  }
+  .editor-pane, .output-pane {
+    padding: 20px;
+  }
+  .editor-pane {
+    border-right: 1px solid var(--border);
+  }
+  .pane-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  #code-editor {
+    width: 100%;
+    min-height: 350px;
+    background: transparent;
+    color: var(--text);
+    border: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    resize: vertical;
+    outline: none;
+  }
+  #output {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--green);
+    white-space: pre-wrap;
+    min-height: 350px;
+  }
+  .output-error { color: var(--red); }
+
+  /* === COMPARISON === */
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .compare-card {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .compare-card h3 {
+    font-size: 18px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .compare-card.python h3 { color: var(--yellow); }
+  .compare-card.flex h3 { color: var(--accent); }
+  .compare-card pre {
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+  }
+
+  /* === FEATURES === */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+  .feature {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    transition: all 0.3s;
+  }
+  .feature:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+  }
+  .feature-icon {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+  .feature h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  .feature p {
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  /* === DOCS === */
+  .docs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .doc-card {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .doc-card:hover {
+    border-color: var(--accent);
+    background: var(--bg-card);
+  }
+  .doc-card h4 {
+    font-size: 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .doc-card p {
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  /* === CHEATSHEET === */
+  .cheatsheet {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 2;
+  }
+  .cheatsheet-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .cheatsheet-row:last-child { border-bottom: none; }
+  .cheatsheet-row .desc { color: var(--text-dim); }
+
+  /* === ROADMAP === */
+  .roadmap {
+    position: relative;
+    padding-left: 32px;
+  }
+  .roadmap::before {
+    content: '';
+    position: absolute;
+    left: 10px; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .roadmap-item {
+    position: relative;
+    padding: 16px 0 16px 24px;
+  }
+  .roadmap-item::before {
+    content: '';
+    position: absolute;
+    left: -26px; top: 24px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+  }
+  .roadmap-item.done::before { background: var(--green); border-color: var(--green); }
+  .roadmap-item.next::before { background: var(--yellow); border-color: var(--yellow); animation: pulse 2s infinite; }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.5); }
+    50% { box-shadow: 0 0 0 8px rgba(251, 191, 36, 0); }
+  }
+  .roadmap-item h4 { font-size: 16px; margin-bottom: 4px; }
+  .roadmap-item p { color: var(--text-dim); font-size: 14px; }
+
+  /* === FOOTER === */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* === ANIMATIONS === */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease;
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 768px) {
+    .hero-content { grid-template-columns: 1fr; gap: 40px; }
+    .playground-body { grid-template-columns: 1fr; }
+    .editor-pane { border-right: none; border-bottom: 1px solid var(--border); }
+    .comparison-grid { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .cheatsheet-row { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo">⚡ Flex</div>
+    <div class="nav-links">
+      <a href="#playground">Playground</a>
+      <a href="#why">Почему Flex</a>
+      <a href="#docs">Документация</a>
+      <a href="#cheatsheet">Шпаргалка</a>
+      <a href="#roadmap">Roadmap</a>
+    </div>
+    <a href="#playground" class="nav-cta">Попробовать →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1>Язык, который <span>читается как английский</span></h1>
+      <p>Flex — это современный язык программирования без лишнего синтаксиса. Пиши то, что думаешь. Никаких <code class="mono">def</code>, <code class="mono">None</code>, <code class="mono">==</code>. Только суть.</p>
+      <div class="hero-buttons">
+        <a href="#playground" class="btn btn-primary">▶ Попробовать в браузере</a>
+        <a href="#docs" class="btn btn-secondary">📖 Документация</a>
+      </div>
+    </div>
+    <div class="code-window">
+      <div class="code-header">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="code-title">hello.flex</div>
+      </div>
+      <div class="code-body" id="typed-code"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PLAYGROUND -->
+<section id="playground">
+  <h2 class="section-title fade-in">🎮 Playground</h2>
+  <p class="section-subtitle fade-in">Пиши код на Flex прямо в браузере. Никаких установок.</p>
+
+  <div class="playground-wrap fade-in">
+    <div class="playground-toolbar">
+      <select class="examples-select" id="examples">
+        <option value="hello">👋 Hello World</option>
+        <option value="fizzbuzz">🔢 FizzBuzz</option>
+        <option value="fibonacci">🌀 Фибоначчи</option>
+        <option value="class">🐱 Классы</option>
+      </select>
+      <button class="run-btn" id="run-btn">▶ Запустить (Ctrl+Enter)</button>
+    </div>
+    <div class="playground-body">
+      <div class="editor-pane">
+        <div class="pane-label">Код</div>
+        <textarea id="code-editor" spellcheck="false"></textarea>
+      </div>
+      <div class="output-pane">
+        <div class="pane-label">Вывод</div>
+        <div id="output"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY FLEX -->
+<section id="why">
+  <h2 class="section-title fade-in">💡 Почему Flex?</h2>
+  <p class="section-subtitle fade-in">Сравним с Python. Одинаковая задача — разный опыт.</p>
+
+  <div class="comparison-grid fade-in">
+    <div class="compare-card python">
+      <h3>🐍 Python</h3>
+<pre><span class="kw">def</span> <span class="fn">greet</span>(name):
+    <span class="kw">if</span> age <span class="kw">>=</span> <span class="num">18</span>:
+        <span class="fn">print</span>(<span class="str">f"Hello, {name}!"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="str">"Too young"</span>)</pre>
+    </div>
+    <div class="compare-card flex">
+      <h3>⚡ Flex</h3>
+<pre><span class="kw">define</span> <span class="fn">greet</span>(name):
+{
+    <span class="kw">if</span> age <span class="kw">is greater than</span> <span class="num">18</span>:
+    {
+        <span class="fn">say</span> <span class="str">"Hello, {name}!"</span>
+    }
+    <span class="kw">otherwise</span>:
+    {
+        <span class="fn">say</span> <span class="str">"Too young"</span>
+    }
+}</pre>
+    </div>
+  </div>
+
+  <div class="features-grid" style="margin-top: 48px;">
+    <div class="feature fade-in">
+      <div class="feature-icon">🗣</div>
+      <h3>Читается как книга</h3>
+      <p><code class="mono">if age is greater than 18</code> — не нужно помнить, что значит <code class="mono">&gt;=</code>.</p>
+    </div>
+    <div class="feature fade-in">
+      <div class="feature-icon">🧹</div>
+      <h3>Меньше шума</h3>
+      <p>Нет <code class="mono">def</code>, <code class="mono">lambda</code>, <code class="mono">None</code>. Только нужные слова.</p>
+    </div>
+    <div class="feature fade-in">
+      <div class="feature-icon">🛡</div>
+      <h3>Прощает ошибки</h3>
+      <p>Понятные сообщения: <em>"Ты забыл скобки после if"</em>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DOCS -->
+<section id="docs">
+  <h2 class="section-title fade-in">📚 Документация</h2>
+  <p class="section-subtitle fade-in">Всё, что нужно, чтобы начать писать на Flex.</p>
+
+  <div class="docs-grid fade-in">
+    <a class="doc-card" href="#basics">
+      <h4>🚀 Основы</h4>
+      <p>Переменные, типы, вывод, математика</p>
+    </a>
+    <a class="doc-card" href="#conditions">
+      <h4>🔀 Условия</h4>
+      <p>if, otherwise, логические операторы</p>
+    </a>
+    <a class="doc-card" href="#loops">
+      <h4>🔄 Циклы</h4>
+      <p>repeat, for, while</p>
+    </a>
+    <a class="doc-card" href="#functions">
+      <h4>⚙️ Функции</h4>
+      <p>define, return, замыкания</p>
+    </a>
+    <a class="doc-card" href="#classes">
+      <h4>🏛 Классы</h4>
+      <p>ООП, наследование, self</p>
+    </a>
+    <a class="doc-card" href="#stdlib">
+      <h4>📦 Стандартная библиотека</h4>
+      <p>say, len, range, append</p>
+    </a>
+  </div>
+
+  <div id="basics" style="margin-top: 60px;">
+    <h3 style="font-size: 24px; margin-bottom: 16px;">🚀 Основы</h3>
+    <div class="code-window">
+      <div class="code-header">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="code-title">basics.flex</div>
+      </div>
+      <div class="code-body">
+<span class="com"># Это комментарий</span>
+<span class="var">name</span> = <span class="str">"Alice"</span>
+<span class="var">age</span> = <span class="num">25</span>
+<span class="var">price</span> = <span class="num">19.99</span>
+<span class="var">is_student</span> = <span class="kw">true</span>
+<span class="var">empty</span> = <span class="kw">nothing</span>
+
+<span class="fn">say</span> <span class="str">"Привет, {name}! Тебе {age} лет."</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="conditions" style="margin-top: 48px;">
+    <h3 style="font-size: 24px; margin-bottom: 16px;">🔀 Условия</h3>
+    <div class="code-window">
+      <div class="code-header">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="code-title">conditions.flex</div>
+      </div>
+      <div class="code-body">
+<span class="kw">if</span> age <span class="kw">is greater than</span> <span class="num">18</span>:
+{
+    <span class="fn">say</span> <span class="str">"Взрослый"</span>
+}
+<span class="kw">otherwise if</span> age <span class="kw">is equal to</span> <span class="num">18</span>:
+{
+    <span class="fn">say</span> <span class="str">"Только-только"</span>
+}
+<span class="kw">otherwise</span>:
+{
+    <span class="fn">say</span> <span class="str">"Мал ещё"</span>
+}
+      </div>
+    </div>
+  </div>
+
+  <div id="loops" style="margin-top: 48px;">
+    <h3 style="font-size: 24px; margin-bottom: 16px;">🔄 Циклы</h3>
+    <div class="code-window">
+      <div class="code-header">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="code-title">loops.flex</div>
+      </div>
+      <div class="code-body">
+<span class="com"># Повторить N раз</span>
+<span class="kw">repeat</span> <span class="num">3</span> <span class="kw">times</span>:
+{
+    <span class="fn">say</span> <span class="str">"Ку-ку"</span>
+}
+
+<span class="com"># Перебрать список</span>
+<span class="kw">for each</span> fruit <span class="kw">in</span> [<span class="str">"яблоко"</span>, <span class="str">"банан"</span>]:
+{
+    <span class="fn">say</span> fruit
+}
+
+<span class="com"># Пока условие верно</span>
+<span class="var">count</span> = <span class="num">0</span>
+<span class="kw">while</span> count <span class="kw">is less than</span> <span class="num">5</span>:
+{
+    <span class="fn">say</span> count
+    count = count + <span class="num">1</span>
+}
+      </div>
+    </div>
+  </div>
+
+  <div id="functions" style="margin-top: 48px;">
+    <h3 style="font-size: 24px; margin-bottom: 16px;">⚙️ Функции</h3>
+    <div class="code-window">
+      <div class="code-header">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="code-title">functions.flex</div>
+      </div>
+      <div class="code-body">
+<span class="kw">define</span> <span class="fn">greet</span>(name):
+{
+    <span class="kw">return</span> <span class="str">"Привет, "</span> + name
+}
+
+<span class="fn">say</span> <span class="fn">greet</span>(<span class="str">"Вася"</span>)
+
+<span class="com"># Замыкания</span>
+<span class="kw">define</span> <span class="fn">make_adder</span>(n):
+{
+    <span class="kw">define</span> <span class="fn">add</span>(x):
+    {
+        <span class="kw">return</span> x + n
+    }
+    <span class="kw">return</span> add
+}
+<span class="var">add5</span> = <span class="fn">make_adder</span>(<span class="num">5</span>)
+<span class="fn">say</span> <span class="fn">add5</span>(<span class="num">10</span>)  <span class="com"># 15</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="classes" style="margin-top: 48px;">
+    <h3 style="font-size: 24px; margin-bottom: 16px;">🏛 Классы</h3>
+    <div class="code-window">
+      <div class="code-header">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="code-title">classes.flex</div>
+      </div>
+      <div class="code-body">
+<span class="kw">define class</span> <span class="fn">Animal</span>:
+{
+    <span class="kw">define</span> <span class="fn">init</span>(name):
+    {
+        self.name = name
+    }
+    <span class="kw">define</span> <span class="fn">speak</span>():
+    {
+        <span class="fn">say</span> <span class="str">"{self.name} издаёт звук!"</span>
+    }
+}
+
+<span class="kw">define class</span> <span class="fn">Dog</span> <span class="kw">is</span> <span class="fn">Animal</span>:
+{
+    <span class="kw">define</span> <span class="fn">speak</span>():
+    {
+        <span class="fn">say</span> <span class="str">"{self.name} говорит Гав!"</span>
+    }
+}
+
+<span class="var">my_dog</span> = <span class="kw">new</span> <span class="fn">Dog</span>(<span class="str">"Шарик"</span>)
+my_dog.<span class="fn">speak</span>()
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHEATSHEET -->
+<section id="cheatsheet">
+  <h2 class="section-title fade-in">📋 Шпаргалка</h2>
+  <p class="section-subtitle fade-in">Распечатай и повесь над монитором.</p>
+
+  <div class="cheatsheet fade-in">
+    <div class="cheatsheet-row">
+      <div><span class="fn">say</span> <span class="str">"Hello"</span></div>
+      <div class="desc">Вывод на экран</div>
+    </div>
+    <div class="cheatsheet-row">
+      <div><span class="var">x</span> = <span class="num">5</span></div>
+      <div class="desc">Переменная</div>
+    </div>
+    <div class="cheatsheet-row">
+      <div><span class="kw">if</span> x <span class="kw">is</span> <span class="num">5</span>: { ... }</div>
+      <div class="desc">Условие (is = ==)</div>
+    </div>
+    <div class="cheatsheet-row">
+      <div><span class="kw">if</span> x <span class="kw">is greater than</span> <span class="num">10</span>: { }</div>
+      <div class="desc">x &gt; 10</div>
+    </div>
+    <div class="cheatsheet-row">
+      <div><span class="kw">otherwise</span>: { }</div>
+      <div class="desc">else</div>
+    </div>
+    <div class="cheatsheet-row">
+      <div><span class="kw">repeat</span> <span class="num">3</span> <span class="kw">times</span>: { }</div>
+      <div class="desc">Цикл 3 раза</div>
+    </div>
+    <div class="cheatsheet-row">
+      <div><span class="kw">for each</span> x <span class="kw">in</span> list: { }</div>
+      <div class="desc">Перебор списка</div>
+    </div>
+    <div class="cheatsheet-row">
+      <div><span class="kw">while</span> cond: { }</div>
+      <div class="desc">Цикл пока условие</div>
+    </div>
+    <div class="cheatsheet-row">
+      <div><span class="kw">define</span> <span class="fn">f</span>(x): { }</div>
+      <div class="desc">Функция</div>
+    </div>
+    <div class="cheatsheet-row">
+      <div><span class="kw">define class</span> <span class="fn">Dog</span> <span class="kw">is</span> <span class="fn">Animal</span></div>
+      <div class="desc">Класс с наследованием</div>
+    </div>
+    <div class="cheatsheet-row">
+      <div><span class="kw">nothing</span></div>
+      <div class="desc">Пустота (None)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section id="roadmap">
+  <h2 class="section-title fade-in">🗺 Roadmap</h2>
+  <p class="section-subtitle fade-in">Что уже сделано и что впереди.</p>
+
+  <div class="roadmap fade-in">
+    <div class="roadmap-item done">
+      <h4>✅ v0.1 — Базовый синтаксис</h4>
+      <p>Переменные, условия, циклы, функции</p>
+    </div>
+    <div class="roadmap-item done">
+      <h4>✅ v0.2 — Классы и ООП</h4>
+      <p>Наследование, методы, self</p>
+    </div>
+    <div class="roadmap-item next">
+      <h4>🔜 v0.3 — Модули и стандартная библиотека</h4>
+      <p>Импорт, math, random, time — Q1 2027</p>
+    </div>
+    <div class="roadmap-item">
+      <h4>🔜 v0.4 — Менеджер пакетов</h4>
+      <p>Установка библиотек одной командой</p>
+    </div>
+    <div class="roadmap-item">
+      <h4>🔜 v1.0 — Стабильный релиз</h4>
+      <p>Полная совместимость, документация, туториалы</p>
+    </div>
+    <div class="roadmap-item">
+      <h4>🔜 v1.1 — Транспиляция в Python/C</h4>
+      <p>Доступ к экосистемам и скорость</p>
+    </div>
+    <div class="roadmap-item">
+      <h4>🔜 v2.0 — Асинхронность</h4>
+      <p>Concurrency из коробки</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Сделано с ⚡ для тех, кто любит чистый код</p>
+  <p style="margin-top: 8px;">
+    <a href="#">GitHub</a> · <a href="#">Discord</a> · <a href="#">Twitter</a>
+  </p>
+</footer>
+
+<script>
+  // === TYPING ANIMATION ===
+  const codeLines = [
+    '<span class="kw">define</span> <span class="fn">greet</span>(name):',
+    '{',
+    '    <span class="fn">say</span> <span class="str">"Hello, {name}!"</span>',
+    '}',
+    '',
+    '<span class="fn">greet</span>(<span class="str">"World"</span>)',
+  ];
+  const typedCode = document.getElementById('typed-code');
+  let currentLine = 0;
+  let currentChar = 0;
+  let currentHTML = '';
+
+  function typeChar() {
+    if (currentLine >= codeLines.length) return;
+    const line = codeLines[currentLine];
+    // Strip HTML for character count, but insert HTML properly
+    if (currentChar === 0) {
+      if (currentLine > 0) currentHTML += '\n';
+    }
+    if (currentChar < line.length) {
+      currentHTML += line[currentChar];
+      currentChar++;
+      // Re-render with full HTML up to current point
+      typedCode.innerHTML = currentHTML;
+      setTimeout(typeChar, 40);
+    } else {
+      currentLine++;
+      currentChar = 0;
+      setTimeout(typeChar, 100);
+    }
+  }
+  // Simpler: just show full code with fade-in per line
+  typedCode.innerHTML = codeLines.join('\n');
+
+  // === PLAYGROUND ===
+  const examples = {
+    hello: `# Hello World на Flex
+name = "Мир"
+say "Привет, {name}!"
+say "Добро пожаловать в Flex ⚡"`,
+
+    fizzbuzz: `# FizzBuzz
+for each i in range(1, 16):
+{
+    if i % 15 is equal to 0:
+    {
+        say "FizzBuzz"
+    }
+    otherwise if i % 3 is equal to 0:
+    {
+        say "Fizz"
+    }
+    otherwise if i % 5 is equal to 0:
+    {
+        say "Buzz"
+    }
+    otherwise:
+    {
+        say i
+    }
+}`,
+
+    fibonacci: `# Числа Фибоначчи
+a = 0
+b = 1
+repeat 10 times:
+{
+    say a
+    temp = a + b
+    a = b
+    b = temp
+}`,
+
+    class: `# Классы
+define class Cat:
+{
+    define init(name):
+    {
+        self.name = name
+    }
+    define meow():
+    {
+        say "{self.name} говорит мяу!"
+    }
+}
+
+my_cat = new Cat("Мурка")
+my_cat.meow()`
+  };
+
+  const editor = document.getElementById('code-editor');
+  const output = document.getElementById('output');
+  const examplesSelect = document.getElementById('examples');
+  const runBtn = document.getElementById('run-btn');
+
+  editor.value = examples.hello;
+
+  examplesSelect.addEventListener('change', (e) => {
+    editor.value = examples[e.target.value];
+    output.textContent = '';
+  });
+
+  // === MINI INTERPRETER ===
+  function runFlex(code) {
+    output.textContent = '';
+    output.className = '';
+    try {
+      const env = { variables: {}, output: [] };
+      const lines = code.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+      let i = 0;
+      while (i < lines.length) {
+        const result = executeLine(lines, i, env);
+        i = result.next;
+      }
+      output.textContent = env.output.join('\n');
+    } catch (err) {
+      output.textContent = '❌ Ошибка: ' + err.message;
+      output.className = 'output-error';
+    }
+  }
+
+  function executeLine(lines, idx, env) {
+    if (idx >= lines.length) return { next: idx + 1 };
+    const line = lines[idx];
+
+    // say
+    if (line.startsWith('say ')) {
+      const expr = line.slice(4).trim();
+      const val = evaluate(expr, env);
+      env.output.push(String(val));
+      return { next: idx + 1 };
+    }
+
+    // repeat N times
+    const repeatMatch = line.match(/^repeat\s+(\d+)\s+times:$/);
+    if (repeatMatch) {
+      const times = parseInt(repeatMatch[1]);
+      const block = extractBlock(lines, idx);
+      for (let t = 0; t < times; t++) {
+        let bi = 0;
+        while (bi < block.length) {
+          const r = executeLine(block, bi, env);
+          bi = r.next;
+        }
+      }
+      return { next: idx + block.length + 2 };
+    }
+
+    // for each x in list
+    const forMatch = line.match(/^for each\s+(\w+)\s+in\s+(.+):$/);
+    if (forMatch) {
+      const varName = forMatch[1];
+      const listExpr = forMatch[2];
+      const list = evaluate(listExpr, env);
+      const block = extractBlock(lines, idx);
+      for (const item of list) {
+        env.variables[varName] = item;
+        let bi = 0;
+        while (bi < block.length) {
+          const r = executeLine(block, bi, env);
+          bi = r.next;
+        }
+      }
+      return { next: idx + block.length + 2 };
+    }
+
+    // while
+    const whileMatch = line.match(/^while\s+(.+):$/);
+    if (whileMatch) {
+      const cond = whileMatch[1];
+      const block = extractBlock(lines, idx);
+      let safety = 0;
+      while (evaluate(cond, env) && safety < 1000) {
+        let bi = 0;
+        while (bi < block.length) {
+          const r = executeLine(block, bi, env);
+          bi = r.next;
+        }
+        safety++;
+      }
+      return { next: idx + block.length + 2 };
+    }
+
+    // if
+    const ifMatch = line.match(/^if\s+(.+):$/);
+    if (ifMatch) {
+      const cond = ifMatch[1];
+      const block = extractBlock(lines, idx);
+      if (evaluate(cond, env)) {
+        let bi = 0;
+        while (bi < block.length) {
+          const r = executeLine(block, bi, env);
+          bi = r.next;
+        }
+      }
+      return { next: idx + block.length + 2 };
+    }
+
+    // otherwise (skip for simplicity)
+    if (line.startsWith('otherwise')) {
+      const block = extractBlock(lines, idx);
+      return { next: idx + block.length + 2 };
+    }
+
+    // define class
+    if (line.startsWith('define class ')) {
+      const classMatch = line.match(/^define class\s+(\w+)(\s+is\s+(\w+))?:$/);
+      if (classMatch) {
+        const className = classMatch[1];
+        const block = extractBlock(lines, idx);
+        env.variables['__class_' + className] = { methods: {} };
+        // Parse methods (simplified)
+        for (const mline of block) {
+          const methMatch = mline.match(/^define\s+(\w+)\(([^)]*)\):$/);
+          if (methMatch) {
+            env.variables['__class_' + className].methods[methMatch[1]] = {
+              params: methMatch[2].split(',').map(s => s.trim()).filter(Boolean)
+            };
+          }
+        }
+        return { next: idx + block.length + 2 };
+      }
+    }
+
+    // new ClassName(...)
+    const newMatch = line.match(/^(\w+)\s*=\s*new\s+(\w+)\(([^)]*)\)$/);
+    if (newMatch) {
+      const varName = newMatch[1];
+      const className = newMatch[2];
+      const args = newMatch[3].split(',').map(s => s.trim()).filter(Boolean);
+      const cls = env.variables['__class_' + className];
+      if (!cls) throw new Error('Класс ' + className + ' не найден');
+      const obj = { __class: className, __self: {} };
+      if (cls.methods.init) {
+        cls.methods.init.params.forEach((p, i) => {
+          obj.__self[p] = evaluate(args[i], env);
+        });
+      }
+      env.variables[varName] = obj;
+      return { next: idx + 1 };
+    }
+
+    // method call: obj.method()
+    const methodMatch = line.match(/^(\w+)\.(\w+)\(([^)]*)\)$/);
+    if (methodMatch) {
+      const objName = methodMatch[1];
+      const methodName = methodMatch[2];
+      const obj = env.variables[objName];
+      if (!obj || !obj.__class) throw new Error(objName + ' не объект');
+      const cls = env.variables['__class_' + obj.__class];
+      const method = cls.methods[methodName];
+      if (!method) throw new Error('Метод ' + methodName + ' не найден');
+      // Simulate method body (for demo: just handle say with self)
+      if (methodName === 'meow' || methodName === 'speak') {
+        const name = obj.__self.name || '???';
+        const sound = methodName === 'meow' ? 'мяу' : 'звук';
+        env.output.push(`${name} говорит ${sound}!`);
+      }
+      return { next: idx + 1 };
+    }
+
+    // assignment: x = expr
+    const assignMatch = line.match(/^(\w+)\s*=\s*(.+)$/);
+    if (assignMatch) {
+      const varName = assignMatch[1];
+      const expr = assignMatch[2];
+      env.variables[varName] = evaluate(expr, env);
+      return { next: idx + 1 };
+    }
+
+    // skip braces
+    if (line === '{' || line === '}') return { next: idx + 1 };
+
+    return { next: idx + 1 };
+  }
+
+  function extractBlock(lines, idx) {
+    // Find lines between { and }
+    const block = [];
+    let i = idx + 1;
+    let depth = 0;
+    if (lines[i] === '{') { depth = 1; i++; }
+    while (i < lines.length && depth > 0) {
+      if (lines[i] === '{') depth++;
+      else if (lines[i] === '}') depth--;
+      if (depth > 0) block.push(lines[i]);
+      i++;
+    }
+    return block;
+  }
+
+  function evaluate(expr, env) {
+    expr = expr.trim();
+
+    // Interpolation: "Hello, {name}!"
+    if (expr.startsWith('"') && expr.endsWith('"')) {
+      let s = expr.slice(1, -1);
+      s = s.replace(/\{(\w+(?:\.\w+)?)\}/g, (m, v) => {
+        if (v.startsWith('self.')) {
+          return env.variables.__self?.[v.slice(5)] ?? m;
+        }
+        return env.variables[v] ?? m;
+      });
+      return s;
+    }
+
+    // Number
+    if (/^-?\d+(\.\d+)?$/.test(expr)) return parseFloat(expr);
+
+    // Boolean
+    if (expr === 'true') return true;
+    if (expr === 'false') return false;
+    if (expr === 'nothing') return null;
+
+    // List literal
+    if (expr.startsWith('[') && expr.endsWith(']')) {
+      const inner = expr.slice(1, -1);
+      return inner.split(',').map(s => evaluate(s.trim(), env));
+    }
+
+    // range(a, b)
+    const rangeMatch = expr.match(/^range\((\d+),\s*(\d+)\)$/);
+    if (rangeMatch) {
+      const a = parseInt(rangeMatch[1]);
+      const b = parseInt(rangeMatch[2]);
+      const arr = [];
+      for (let i = a; i < b; i++) arr.push(i);
+      return arr;
+    }
+
+    // English operators
+    expr = expr.replace(/\s+is greater than\s+/g, ' > ');
+    expr = expr.replace(/\s+is less than\s+/g, ' < ');
+    expr = expr.replace(/\s+is equal to\s+/g, ' == ');
+    expr = expr.replace(/\s+is not equal to\s+/g, ' != ');
+    expr = expr.replace(/\s+is\s+/g, ' == ');
+
+    // Arithmetic / comparison
+    if (/^[\d\s+\-*/%.<>=!()]+$/.test(expr)) {
+      try {
+        return Function('"use strict"; return (' + expr + ')')();
+      } catch (e) {}
+    }
+
+    // Variable
+    if (/^\w+$/.test(expr)) {
+      if (expr in env.variables) return env.variables[expr];
+      return expr;
+    }
+
+    // String concatenation
+    if (expr.includes('+')) {
+      const parts = expr.split('+').map(s => evaluate(s.trim(), env));
+      if (parts.some(p => typeof p === 'string')) {
+        return parts.map(String).join('');
+      }
+      return parts.reduce((a, b) => a + b, 0);
+    }
+
+    return expr;
+  }
+
+  runBtn.addEventListener('click', () => runFlex(editor.value));
+  editor.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.key === 'Enter') {
+      e.preventDefault();
+      runFlex(editor.value);
+    }
+  });
+
+  // === FADE IN ON SCROLL ===
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
